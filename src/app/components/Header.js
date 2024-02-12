@@ -2,11 +2,11 @@
 import React, { useContext } from "react";
 import { ThemeContext } from "@/app/context/ThemeContext";
 
-const Header = ({ title, children }) => {
+const Header = ({ title, click, children }) => {
   const { changeTheme } = useContext(ThemeContext);
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-100 px-12">
       <div className="flex-none">
         <div className="drawer drawer-end">
           <input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -92,7 +92,22 @@ const Header = ({ title, children }) => {
           </div>
         </div>
       </div>
-      <div className="flex-none"></div>
+      <div className="flex-none">
+        <button className="btn btn-primary" type="button" onClick={click}>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 4C11.4477 4 11 4.44772 11 5V11H5C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13H11V19C11 19.5523 11.4477 20 12 20C12.5523 20 13 19.5523 13 19V13H19C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11H13V5C13 4.44772 12.5523 4 12 4Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 };
