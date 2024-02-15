@@ -2,6 +2,8 @@ import { Inter, Imprima } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 import ClientThemeWrapper from "@/app/context/ClientThemeWrapper";
+import Footer from "@/app/components/Footer";
+import Index from "@/app/components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 const imprima = Imprima({
@@ -17,7 +19,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="tr-TR">
-      <body className={imprima.className}>
+      <body className={`${imprima.className}`}>
         <ThemeProvider>
           <ClientThemeWrapper>{children}</ClientThemeWrapper>
         </ThemeProvider>

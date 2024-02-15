@@ -15,7 +15,7 @@ export const ThemeProvider = ({ children }) => {
 
   if (!isMounted)
     return (
-      <div className="h-screen flex items-center justify-center text-5xl">
+      <div className="flex h-screen items-center justify-center text-5xl">
         <span className="loading loading-infinity loading-lg"></span>
       </div>
     );

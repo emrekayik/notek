@@ -1,28 +1,49 @@
 "use client";
+import Link from "next/link";
 import Header from "@/app/components/Header";
 import { useEffect, useState } from "react";
 import db from "@/app/utils/db";
+import { DeleteIcon, NoteIcon, RedoIcon } from "@/app/utils/icons";
+import Footer from "@/app/components/Footer";
 
 export default function Home() {
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState({ title: "", content: "" });
+  const [newNote, setNewNote] = useState({
+    title: "",
+    content: "",
+    createDate: "",
+    updateDate: "",
+  });
   const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Tarih seçenekleri day.month.year clock(14.02.2024 14:30)
+  const dateOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  };
 
   useEffect(() => {
     // Tüm notları veritabanından al
     db.notes.toArray().then((result) => setNotes(result));
   }, []);
 
-  const handleAddNote = async () => {
-    // Yeni notu veritabanına ekle
-    await db.notes.add(newNote);
-    // Notları güncelle
+  const generateRandomNote = async () => {
+    const randomNote = {
+      title: "Lorem Ipsum",
+      content:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec ex nec odio tincidunt auctor. Nam auctor, odio nec tincidunt varius, libero libero varius nunc, nec tincidunt odio odio nec odio. Nullam",
+      createDate: new Date().toLocaleDateString(undefined, dateOptions),
+    };
+    await db.notes.add(randomNote);
+
     const updatedNotes = await db.notes.toArray();
     setNotes(updatedNotes);
-    // Yeni not girişini temizle
-    setNewNote({ title: "", content: "" });
   };
-
   const handleResetNotes = async () => {
     // Tüm notları veritabanından sil
     await db.notes.clear();
@@ -30,27 +51,109 @@ export default function Home() {
     setNotes([]);
   };
 
+  const handleSaveNote = async (id, title, content) => {
+    const updateDate = new Date().toLocaleDateString(undefined, dateOptions);
+    // Notu veritabanında güncelle
+    await db.notes.update(id, { title, content, updateDate });
+    // Notları güncelle
+    const updatedNotes = await db.notes.toArray();
+    setNotes(updatedNotes);
+  };
+
+  const handleAddNote = async () => {
+    if (newNote.title.trim() !== "" && newNote.content.trim() !== "") {
+      const createDate = new Date().toLocaleDateString(undefined, dateOptions);
+
+      // Yeni notu veritabanına ekle
+      await db.notes.add({
+        ...newNote,
+        createDate,
+      });
+      // Notları güncelle
+      const updatedNotes = await db.notes.toArray();
+      setNotes(updatedNotes);
+      // Yeni not girişini temizle
+      setNewNote({ title: "", content: "" });
+    }
+  };
+
+  const deleteNote = async (id) => {
+    await db.notes.delete(id);
+    const updatedNotes = await db.notes.toArray();
+    setNotes(updatedNotes);
+  };
+
+  const filteredNotes = notes.filter((note) => {
+    const searchText = searchTerm.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(searchText) ||
+      note.content.toLowerCase().includes(searchText)
+    );
+  });
+
   return (
     <main className={"min-h-screen"}>
-      <Header title={"notek"} click={() => setShowModal(true)}>
+      <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm}>
+        <button className="btn btn-warning" onClick={generateRandomNote}>
+          Lorem Not Oluştur
+        </button>
         <button className="btn btn-error" onClick={handleResetNotes}>
           Notları Sıfırla
         </button>
       </Header>
-      <div className="container mx-auto px-12 py-4">
+      <div className="container mx-auto mb-12 px-12 py-4">
         <button
           className="btn btn-primary mb-4"
           type="button"
           onClick={() => setShowModal(true)}
         >
-          Not Ekle
+          <NoteIcon />
         </button>
-        <div className="bg-base-200">
-          <ul className="">
-            {notes.map((note) => (
-              <li key={note.id}>
-                <strong>{note.title}</strong>
-                <p>{note.content}</p>
+
+        <div className="bg-base-100">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {filteredNotes.map((note) => (
+              <li
+                key={note.id}
+                className="space-y-6 rounded-md bg-base-200 px-8 py-4"
+              >
+                <strong
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                  onBlur={(e) =>
+                    handleSaveNote(note.id, e.target.innerText, note.content)
+                  }
+                >
+                  {note.title}
+                </strong>
+
+                <p
+                  contentEditable={true}
+                  suppressContentEditableWarning={true}
+                  onBlur={(e) =>
+                    handleSaveNote(note.id, note.title, e.target.innerText)
+                  }
+                >
+                  {note.content}
+                </p>
+                <div className="flex items-center justify-end">
+                  <strong className="flex-1">
+                    {note.createDate}
+                    {note.updateDate ? " - " + note.updateDate : ""}
+                  </strong>
+                  <div className="space-x-2">
+                    <Link href={`/note/${note.id}`} className="btn btn-info">
+                      <RedoIcon />
+                    </Link>
+                    <button
+                      className="btn btn-outline btn-error text-error"
+                      type="button"
+                      onClick={() => deleteNote(note.id)}
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
@@ -58,27 +161,13 @@ export default function Home() {
 
         {showModal ? (
           <>
-            <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-              <div className="relative w-auto my-6 mx-auto max-w-3xl">
+            <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
+              <div className="relative mx-auto my-6 w-auto max-w-3xl">
                 {/*content*/}
-                <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                <div className="relative flex w-full flex-col rounded-lg border-0 bg-white shadow-lg outline-none focus:outline-none">
                   {/*header*/}
-                  <div className="flex items-center justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                  <div className="border-blueGray-200 flex items-center justify-between rounded-t border-b border-solid p-5">
                     <h3 className="text-xl font-semibold">Not Al</h3>
-                    <button className="btn" onClick={() => setShowModal(false)}>
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </button>
                   </div>
                   {/*body*/}
                   <div className="w-full">
@@ -94,7 +183,7 @@ export default function Home() {
                           onChange={(e) =>
                             setNewNote({ ...newNote, title: e.target.value })
                           }
-                          required
+                          className="input input-bordered w-full max-w-xs"
                         />
                       </div>
                       <div className="form-control">
@@ -102,7 +191,7 @@ export default function Home() {
                           <span className="label-text">İçerik</span>
                         </label>
                         <textarea
-                          className="textarea textarea-primary"
+                          className="textarea textarea-bordered"
                           placeholder="Notunuz"
                           value={newNote.content}
                           onChange={(e) =>
@@ -110,7 +199,7 @@ export default function Home() {
                           }
                         ></textarea>
                       </div>
-                      <div className="form-control gap-2 mt-6">
+                      <div className="form-control mt-6 gap-2">
                         <button
                           className="btn btn-primary"
                           onClick={handleAddNote}
@@ -122,7 +211,7 @@ export default function Home() {
                           type="button"
                           onClick={() => setShowModal(false)}
                         >
-                          Close
+                          Kapat
                         </button>
                       </div>
                     </div>
@@ -130,15 +219,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+            <div className="fixed inset-0 z-40 bg-black opacity-25"></div>
           </>
         ) : null}
       </div>
-      <footer className="fixed bottom-0 footer footer-center p-4 bg-base-300 text-base-content">
-        <aside>
-          <p>StudioEK 2024</p>
-        </aside>
-      </footer>
+      <Footer />
     </main>
   );
 }
