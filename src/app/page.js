@@ -1,10 +1,10 @@
 "use client";
 
-import Footer from "@/app/components/Footer";
-import Header from "@/app/components/Header";
-
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import Footer from "@/app/components/Footer";
+import Header from "@/app/components/Header";
 
 import db from "@/app/utils/db";
 import { DeleteIcon, NoteIcon, RedoIcon } from "@/app/utils/icons";

@@ -1,11 +1,11 @@
 "use client";
 
-import Footer from "@/app/components/Footer";
-import Header from "@/app/components/Header";
-
 import { toPng } from "html-to-image";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+
+import Footer from "@/app/components/Footer";
+import Header from "@/app/components/Header";
 
 import db from "@/app/utils/db";
 import { DeleteIcon, DownloadIcon } from "@/app/utils/icons";

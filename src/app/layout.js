@@ -1,9 +1,9 @@
-import Footer from "@/app/components/Footer";
-import Index from "@/app/components/Header";
-
 import ClientThemeWrapper from "@/app/context/ClientThemeWrapper";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 import { Imprima, Inter } from "next/font/google";
+
+import Footer from "@/app/components/Footer";
+import Index from "@/app/components/Header";
 
 import "./globals.css";
 
