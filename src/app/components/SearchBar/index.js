@@ -1,4 +1,5 @@
 import React from "react";
+
 import { SearchIcon } from "@/app/utils/icons";
 
 const SearchBar = ({ searchTerm, onSearchTermChange }) => {
@@ -7,7 +8,7 @@ const SearchBar = ({ searchTerm, onSearchTermChange }) => {
       <SearchIcon />
       <input
         type="text"
-        className="grow"
+        className=" grow"
         placeholder="Ara"
         value={searchTerm}
         onChange={(e) => onSearchTermChange(e.target.value)}

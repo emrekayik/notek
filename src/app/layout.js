@@ -1,9 +1,11 @@
-import { Inter, Imprima } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/app/context/ThemeContext";
-import ClientThemeWrapper from "@/app/context/ClientThemeWrapper";
 import Footer from "@/app/components/Footer";
 import Index from "@/app/components/Header";
+
+import ClientThemeWrapper from "@/app/context/ClientThemeWrapper";
+import { ThemeProvider } from "@/app/context/ThemeContext";
+import { Imprima, Inter } from "next/font/google";
+
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 const imprima = Imprima({

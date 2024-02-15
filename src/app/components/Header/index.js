@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
-import ThemeSwitcher from "@/app/components/ThemeSwitcher";
+
 import SearchBar from "@/app/components/SearchBar";
+import ThemeSwitcher from "@/app/components/ThemeSwitcher";
+
+import React from "react";
+
 import { GithubIcon } from "@/app/utils/icons";
 
 const Header = ({

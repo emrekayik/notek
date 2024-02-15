@@ -1,7 +1,6 @@
 // Header'daki tema seçme componenti
-
-import React, { useContext } from "react";
 import { ThemeContext } from "@/app/context/ThemeContext";
+import React, { useContext } from "react";
 
 const ThemeSwitcher = () => {
   const { changeTheme } = useContext(ThemeContext);
